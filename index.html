@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContaPyME | Contabilidad Digital para PyMES Mexicanas</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ContaPyME">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
+    </script>
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-sidebar: #0f172a;
+            --bg-hover: #273449;
+            --bg-input: #1a2332;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #3b82f6;
+            --accent-light: #60a5fa;
+            --accent-dark: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.12);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.12);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.12);
+            --info: #06b6d4;
+            --border: #334155;
+            --border-light: #475569;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            width: 260px;
+            min-width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+            transition: transform var(--transition-slow);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .sidebar-logo {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo .logo-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .sidebar-logo .logo-text {
+            font-weight: 700;
+            font-size: 1.1rem;
+            line-height: 1.2;
+            letter-spacing: -0.3px;
+        }
+        .sidebar-logo .logo-text span {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-y: auto;
+        }
+
+        .sidebar-nav .nav-section {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            padding: 16px 10px 6px;
+            font-weight: 600;
+        }
+
+        .sidebar-nav button {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all var(--transition);
+            text-align: left;
+            width: 100%;
+            font-family: inherit;
+            letter-spacing: -0.1px;
+            position: relative;
+        }
+
+        .sidebar-nav button i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+            opacity: 0.7;
+            transition: all var(--transition);
+        }
+
+        .sidebar-nav button:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+        .sidebar-nav button:hover i {
+            opacity: 1;
+        }
+        .sidebar-nav button.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            font-weight: 600;
+        }
+        .sidebar-nav button.active i {
+            opacity: 1;
+            color: #fff;
+        }
+        .sidebar-nav button .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        .sidebar-footer .mexico-flag {
+            font-size: 1.2rem;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+        .top-bar h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-bar h2 i {
+            color: var(--accent-light);
+            font-size: 1.3rem;
+        }
+        .top-bar-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            letter-spacing: -0.1px;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 10px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--border-light);
+            color: var(--text-primary);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent-light);
+            background: var(--bg-hover);
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.78rem;
+            border-radius: 6px;
+        }
+        .btn-danger-text {
+            background: transparent;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            transition: all var(--transition);
+        }
+        .btn-danger-text:hover {
+            background: var(--danger-bg);
+        }
+
+        .content-area {
+            padding: 24px 28px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ========== CARDS & GRID ========== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-light);
+            transform: translateY(-2px);
+        }
+        .stat-card .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+        .stat-card .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+        .stat-card .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-top: 2px;
+        }
+        .stat-card .stat-sub {
+            font-size: 0.72rem;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        .stat-icon.income {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+        .stat-icon.expense {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+        .stat-icon.balance {
+            background: var(--accent-glow);
+            color: var(--accent-light);
+        }
+        .stat-icon.iva {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+        .trend-up {
+            color: var(--success);
+        }
+        .trend-down {
+            color: var(--danger);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .card-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .card-body.no-padding {
+            padding: 0;
+        }
+
+        /* ========== TABLA ========== */
+        .table-container {
+            overflow-x: auto;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        table thead {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+        table thead th {
+            background: var(--bg-hover);
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border);
+        }
+        table tbody td {
+            padding: 11px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        table tbody tr {
+            transition: background var(--transition);
+        }
+        table tbody tr:hover {
+            background: var(--bg-hover);
+        }
+        .badge-type {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+        .badge-ingreso {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+        .badge-egreso {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+        .amount {
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            font-family: 'Inter', monospace;
+            letter-spacing: -0.3px;
+        }
+        .amount.positive {
+            color: var(--success);
+        }
+        .amount.negative {
+            color: var(--danger);
+        }
+
+        /* ========== FORMULARIOS ========== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.1px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: var(--bg-input);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all var(--transition);
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+        .form-full {
+            grid-column: 1 / -1;
+        }
+
+        /* ========== MODAL ========== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(3px);
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 580px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            z-index: 10;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        .modal-close {
+            background: var(--bg-hover);
+            border: none;
+            color: var(--text-secondary);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+        .modal-body {
+            padding: 20px 22px;
+        }
+        .modal-footer {
+            padding: 14px 22px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* ========== CHART CONTAINER ========== */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            max-height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chart-wrapper canvas {
+            max-height: 330px;
+        }
+
+        /* ========== TOAST ========== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 18px;
+            box-shadow: var(--shadow-lg);
+            animation: slideInRight 0.3s ease;
+            font-weight: 500;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 380px;
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        /* ========== EMPTY STATE ========== */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+                min-width: 260px;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .top-bar {
+                padding: 12px 16px;
+            }
+            .content-area {
+                padding: 16px;
+                gap: 14px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .modal {
+                width: 95%;
+                max-width: 95%;
+                border-radius: var(--radius);
+            }
+            .mobile-menu-btn {
+                display: flex !important;
+            }
+        }
+        .mobile-menu-btn {
+            display: none;
+            background: var(--bg-hover);
+            border: none;
+            color: var(--text-primary);
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 1.2rem;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (min-width: 769px) {
+            .mobile-menu-btn {
+                display: none !important;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-light);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        .highlight-box {
+            background: var(--bg-hover);
+            border: 1px dashed var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .highlight-box i {
+            color: var(--accent-light);
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon"><i class="fas fa-calculator"></i></div>
+            <div class="logo-text">ContaPyME<span>Contabilidad Inteligente 🇲🇽</span></div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">Principal</div>
+            <button class="active" data-view="dashboard">
+                <i class="fas fa-th-large"></i> Dashboard
+            </button>
+            <button data-view="ingresos">
+                <i class="fas fa-arrow-down"></i> Ingresos
+            </button>
+            <button data-view="egresos">
+                <i class="fas fa-arrow-up"></i> Egresos
+            </button>
+            <div class="nav-section">Reportes</div>
+            <button data-view="reportes">
+                <i class="fas fa-chart-pie"></i> Reportes Financieros
+            </button>
+            <button data-view="estado-resultados">
+                <i class="fas fa-file-invoice-dollar"></i> Estado de Resultados
+            </button>
+            <div class="nav-section">Herramientas</div>
+            <button data-view="calculadora-iva">
+                <i class="fas fa-percent"></i> Calculadora de IVA
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <span class="mexico-flag">🇲🇽</span> Hecho para PyMES Mexicanas<br>
+            <small>IVA 16% · ISR Referencial</small>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <h2 id="viewTitle"><i class="fas fa-th-large"></i> Dashboard Financiero</h2>
+            <div class="top-bar-actions">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" title="Menú">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="exportarCSV()" title="Exportar datos a CSV">
+                    <i class="fas fa-download"></i> Exportar CSV
+                </button>
+                <button class="btn btn-primary btn-sm" id="btnNuevaTransaccion">
+                    <i class="fas fa-plus-circle"></i> Nueva Transacción
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area" id="contentArea">
+            <!-- Se llena dinámicamente -->
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: Nueva Transacción ==================== -->
+    <div class="modal-overlay" id="modalTransaccion" style="display:none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> Nueva Transacción</h3>
+                <button class="modal-close" id="closeModalTransaccion">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tipo de Movimiento *</label>
+                        <select id="txTipo">
+                            <option value="ingreso">💰 Ingreso</option>
+                            <option value="egreso">📤 Egreso</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha *</label>
+                        <input type="date" id="txFecha">
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría *</label>
+                        <select id="txCategoria">
+                            <option value="">Selecciona categoría</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Monto (MXN) *</label>
+                        <input type="number" id="txMonto" placeholder="0.00" step="0.01" min="0.01">
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Concepto / Descripción *</label>
+                        <input type="text" id="txConcepto" placeholder="Ej: Venta de productos, Pago de renta...">
+                    </div>
+                    <div class="form-group form-full">
+                        <label>¿Incluye IVA? (16%)</label>
+                        <select id="txIncluyeIVA">
+                            <option value="no">No — Monto sin IVA</option>
+                            <option value="si">Sí — El monto YA incluye IVA</option>
+                        </select>
+                    </div>
+                    <div class="form-group form-full highlight-box" id="ivaInfoBox" style="display:none;">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="ivaInfoText"></span>
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Notas adicionales</label>
+                        <textarea id="txNotas" placeholder="Opcional..."></textarea>
+                    </div>
+                </div>
+                <input type="hidden" id="txEditId" value="">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline btn-sm" id="btnCancelarTransaccion">Cancelar</button>
+                <button class="btn btn-primary" id="btnGuardarTransaccion">
+                    <i class="fas fa-save"></i> Guardar Transacción
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TOAST CONTAINER ==================== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        (function() {
+            // ============ DATOS Y ESTADO ============
+            const STORAGE_KEY = 'contapyme_transacciones';
+            const IVA_RATE = 0.16; // 16% IVA México
+
+            let transacciones = [];
+            let vistaActual = 'dashboard';
+            let chartInstance = null;
+
+            // Categorías predefinidas para PyMES mexicanas
+            const categoriasIngreso = [
+                'Ventas de productos', 'Servicios profesionales', 'Consultoría',
+                'Comisiones', 'Renta de inmuebles', 'Intereses ganados',
+                'Ventas por internet', 'Ingresos extraordinarios', 'Otros ingresos'
+            ];
+            const categoriasEgreso = [
+                'Renta de local/oficina', 'Nómina y salarios', 'Servicios (luz, agua, internet)',
+                'Insumos y mercancía', 'Transporte y gasolina', 'Publicidad y marketing',
+                'Honorarios profesionales', 'Impuestos y derechos', 'Mantenimiento',
+                'Seguros', 'Gastos financieros', 'Papelería', 'Otros gastos'
+            ];
+
+            // ============ CARGA INICIAL ============
+            function cargarDatos() {
+                const data = localStorage.getItem(STORAGE_KEY);
+                if (data) {
+                    try {
+                        transacciones = JSON.parse(data);
+                    } catch (e) {
+                        transacciones = [];
+                    }
+                } else {
+                    // Datos de ejemplo
+                    transacciones = generarDatosEjemplo();
+                    guardarDatos();
+                }
+            }
+
+            function guardarDatos() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(transacciones));
+            }
+
+            function generarDatosEjemplo() {
+                const hoy = new Date();
+                const ejemplos = [];
+                const conceptosIngreso = [
+                    'Venta de mercancía al cliente A', 'Servicio de consultoría mensual',
+                    'Comisión por venta de equipo', 'Renta de bodega cobrada',
+                    'Venta en línea - Pedido #234'
+                ];
+                const conceptosEgreso = [
+                    'Pago de renta del local', 'Nómina quincenal empleados',
+                    'Pago CFE - Recibo bimestral', 'Compra de insumos para producción',
+                    'Gasolina y viáticos', 'Campaña publicidad Facebook Ads',
+                    'Honorarios contador externo', 'Pago de seguro de negocio'
+                ];
+
+                for (let i = 0; i < 14; i++) {
+                    const diasAtras = Math.floor(Math.random() * 60);
+                    const fecha = new Date(hoy);
+                    fecha.setDate(fecha.getDate() - diasAtras);
+                    const tipo = i < 6 ? 'ingreso' : 'egreso';
+                    const monto = tipo === 'ingreso' ?
+                        Math.round(Math.random() * 50000 + 3000) :
+                        Math.round(Math.random() * 25000 + 800);
+                    const cat = tipo === 'ingreso' ?
+                        categoriasIngreso[Math.floor(Math.random() * categoriasIngreso.length)] :
+                        categoriasEgreso[Math.floor(Math.random() * categoriasEgreso.length)];
+                    const concepto = tipo === 'ingreso' ?
+                        conceptosIngreso[i % conceptosIngreso.length] :
+                        conceptosEgreso[i % conceptosEgreso.length];
+
+                    ejemplos.push({
+                        id: Date.now() - i * 1000 + Math.floor(Math.random() * 500),
+                        tipo,
+                        fecha: fecha.toISOString().split('T')[0],
+                        categoria: cat,
+                        monto,
+                        concepto,
+                        incluyeIVA: Math.random() > 0.5 ? 'si' : 'no',
+                        notas: '',
+                        fechaCreacion: fecha.toISOString()
+                    });
+                }
+                return ejemplos;
+            }
+
+            // ============ UTILITARIOS ============
+            function formatoMoneda(cantidad) {
+                return new Intl.NumberFormat('es-MX', {
+                    style: 'currency',
+                    currency: 'MXN',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(cantidad);
+            }
+
+            function formatoMonedaSinSimbolo(cantidad) {
+                return new Intl.NumberFormat('es-MX', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(cantidad);
+            }
+
+            function mostrarToast(mensaje, tipo = 'success') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${tipo}`;
+                toast.innerHTML =
+                    `<i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${mensaje}`;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(120%)';
+                    toast.style.transition = 'all 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 2800);
+            }
+
+            function formatearFecha(fechaStr) {
+                if (!fechaStr) return '';
+                const [y, m, d] = fechaStr.split('-');
+                return `${d}/${m}/${y}`;
+            }
+
+            // ============ CÁLCULOS FINANCIEROS ============
+            function calcularTotales(filtroTransacciones = null) {
+                const tx = filtroTransacciones || transacciones;
+                let totalIngresos = 0;
+                let totalEgresos = 0;
+                let ivaPorPagar = 0;
+                let ivaAcreditable = 0;
+
+                tx.forEach(t => {
+                    const monto = parseFloat(t.monto) || 0;
+                    if (t.tipo === 'ingreso') {
+                        totalIngresos += monto;
+                        if (t.incluyeIVA === 'si') {
+                            // El monto ya incluye IVA, desglosamos
+                            const ivaContenido = monto - (monto / (1 + IVA_RATE));
+                            ivaPorPagar += ivaContenido;
+                        }
+                    } else {
+                        totalEgresos += monto;
+                        if (t.incluyeIVA === 'si') {
+                            const ivaContenido = monto - (monto / (1 + IVA_RATE));
+                            ivaAcreditable += ivaContenido;
+                        }
+                    }
+                });
+
+                const balance = totalIngresos - totalEgresos;
+                const ivaNeto = ivaPorPagar - ivaAcreditable;
+
+                return {
+                    totalIngresos,
+                    totalEgresos,
+                    balance,
+                    ivaPorPagar,
+                    ivaAcreditable,
+                    ivaNeto,
+                    totalTransacciones: tx.length
+                };
+            }
+
+            // ============ RENDERIZADO DE VISTAS ============
+            function cambiarVista(vista) {
+                vistaActual = vista;
+                // Actualizar sidebar
+                document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
+                const btn = document.querySelector(`.sidebar-nav button[data-view="${vista}"]`);
+                if (btn) btn.classList.add('active');
+
+                // Actualizar título
+                const titulos = {
+                    dashboard: '<i class="fas fa-th-large"></i> Dashboard Financiero',
+                    ingresos: '<i class="fas fa-arrow-down"></i> Registro de Ingresos',
+                    egresos: '<i class="fas fa-arrow-up"></i> Registro de Egresos',
+                    reportes: '<i class="fas fa-chart-pie"></i> Reportes Financieros',
+                    'estado-resultados': '<i class="fas fa-file-invoice-dollar"></i> Estado de Resultados',
+                    'calculadora-iva': '<i class="fas fa-percent"></i> Calculadora de IVA (16%)'
+                };
+                document.getElementById('viewTitle').innerHTML = titulos[vista] || 'Vista';
+
+                // Renderizar contenido
+                const contentArea = document.getElementById('contentArea');
+                switch (vista) {
+                    case 'dashboard':
+                        contentArea.innerHTML = renderDashboard();
+                        break;
+                    case 'ingresos':
+                        contentArea.innerHTML = renderListaTransacciones('ingreso');
+                        break;
+                    case 'egresos':
+                        contentArea.innerHTML = renderListaTransacciones('egreso');
+                        break;
+                    case 'reportes':
+                        contentArea.innerHTML = renderReportes();
+                        setTimeout(() => inicializarGraficoReportes(), 150);
+                        break;
+                    case 'estado-resultados':
+                        contentArea.innerHTML = renderEstadoResultados();
+                        break;
+                    case 'calculadora-iva':
+                        contentArea.innerHTML = renderCalculadoraIVA();
+                        break;
+                    default:
+                        contentArea.innerHTML = renderDashboard();
+                }
+
+                // Re-vincular eventos
+                vincularEventosTabla();
+                if (vista === 'calculadora-iva') vincularEventosCalculadoraIVA();
+            }
+
+            // ============ DASHBOARD ============
+            function renderDashboard() {
+                const totals = calcularTotales();
+                const ultimasTransacciones = [...transacciones]
+                    .sort((a, b) => new Date(b.fechaCreacion) - new Date(a.fechaCreacion))
+                    .slice(0, 8);
+
+                let html = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon income"><i class="fas fa-arrow-down"></i></div>
+                        <div class="stat-label">Ingresos Totales</div>
+                        <div class="stat-value amount positive">${formatoMoneda(totals.totalIngresos)}</div>
+                        <div class="stat-sub trend-up">↑ Total de ingresos registrados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon expense"><i class="fas fa-arrow-up"></i></div>
+                        <div class="stat-label">Egresos Totales</div>
+                        <div class="stat-value amount negative">${formatoMoneda(totals.totalEgresos)}</div>
+                        <div class="stat-sub trend-down">↓ Total de gastos registrados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon balance"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-label">Balance Neto</div>
+                        <div class="stat-value" style="color:${totals.balance >= 0 ? 'var(--success)' : 'var(--danger)'}">
+                            ${formatoMoneda(totals.balance)}
+                        </div>
+                        <div class="stat-sub">${totals.balance >= 0 ? '👍 Negocio saludable' : '⚠️ Atención requerida'}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon iva"><i class="fas fa-file-invoice"></i></div>
+                        <div class="stat-label">IVA Neto Estimado</div>
+                        <div class="stat-value" style="color:var(--warning)">${formatoMoneda(totals.ivaNeto)}</div>
+                        <div class="stat-sub">Por pagar: ${formatoMoneda(totals.ivaPorPagar)} | Acreditable: ${formatoMoneda(totals.ivaAcreditable)}</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-clock"></i> Últimos Movimientos</h3>
+                        <span style="font-size:0.8rem;color:var(--text-muted)">Total: ${totals.totalTransacciones} transacciones</span>
+                    </div>
+                    <div class="card-body no-padding">
+                        <div class="table-container">
+                            ${ultimasTransacciones.length > 0 ? `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Categoría</th>
+                                        <th>Concepto</th>
+                                        <th style="text-align:right">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${ultimasTransacciones.map(t => `
+                                    <tr>
+                                        <td>${formatearFecha(t.fecha)}</td>
+                                        <td><span class="badge-type ${t.tipo === 'ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${t.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}</span></td>
+                                        <td>${t.categoria}</td>
+                                        <td>${t.concepto}</td>
+                                        <td class="amount ${t.tipo === 'ingreso' ? 'positive' : 'negative'}" style="text-align:right">${formatoMoneda(t.monto)}</td>
+                                    </tr>`).join('')}
+                                </tbody>
+                            </table>` : '<div class="empty-state"><i class="fas fa-inbox"></i><p>No hay transacciones aún. ¡Registra tu primer movimiento!</p></div>'}
+                        </div>
+                    </div>
+                </div>`;
+                return html;
+            }
+
+            // ============ LISTA DE TRANSACCIONES ============
+            function renderListaTransacciones(tipoFiltro) {
+                const filtradas = transacciones
+                    .filter(t => t.tipo === tipoFiltro)
+                    .sort((a, b) => new Date(b.fechaCreacion) - new Date(a.fechaCreacion));
+                const totalFiltrado = filtradas.reduce((sum, t) => sum + (parseFloat(t.monto) || 0), 0);
+                const icono = tipoFiltro === 'ingreso' ? 'fa-arrow-down text-green' : 'fa-arrow-up text-red';
+                const colorTitulo = tipoFiltro === 'ingreso' ? 'var(--success)' : 'var(--danger)';
+
+                let html = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 style="color:${colorTitulo}"><i class="fas ${icono.split(' ')[0]}" style="color:${colorTitulo}"></i> 
+                            ${tipoFiltro === 'ingreso' ? 'Ingresos Registrados' : 'Egresos Registrados'}
+                        </h3>
+                        <span style="font-weight:700;font-size:1rem;color:${colorTitulo}">Total: ${formatoMoneda(totalFiltrado)}</span>
+                    </div>
+                    <div class="card-body no-padding">
+                        <div class="table-container" style="max-height:500px;">
+                            ${filtradas.length > 0 ? `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Categoría</th>
+                                        <th>Concepto</th>
+                                        <th>IVA Incl.</th>
+                                        <th style="text-align:right">Monto</th>
+                                        <th style="text-align:center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filtradas.map(t => `
+                                    <tr>
+                                        <td>${formatearFecha(t.fecha)}</td>
+                                        <td>${t.categoria}</td>
+                                        <td>${t.concepto}</td>
+                                        <td>${t.incluyeIVA === 'si' ? '✅ Sí' : '❌ No'}</td>
+                                        <td class="amount ${tipoFiltro === 'ingreso' ? 'positive' : 'negative'}" style="text-align:right">${formatoMoneda(t.monto)}</td>
+                                        <td style="text-align:center">
+                                            <button class="btn-danger-text btn-editar" data-id="${t.id}" title="Editar"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-danger-text btn-eliminar" data-id="${t.id}" title="Eliminar" style="color:var(--danger)"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>`).join('')}
+                                </tbody>
+                            </table>` : `<div class="empty-state"><i class="fas fa-inbox"></i><p>No hay ${tipoFiltro === 'ingreso' ? 'ingresos' : 'egresos'} registrados.</p></div>`}
+                        </div>
+                    </div>
+                </div>`;
+                return html;
+            }
+
+            // ============ REPORTES ============
+            function renderReportes() {
+                const totals = calcularTotales();
+                // Datos para gráfico de categorías
+                const catIngresos = {};
+                const catEgresos = {};
+                transacciones.forEach(t => {
+                    if (t.tipo === 'ingreso') {
+                        catIngresos[t.categoria] = (catIngresos[t.categoria] || 0) + parseFloat(t.monto);
+                    } else {
+                        catEgresos[t.categoria] = (catEgresos[t.categoria] || 0) + parseFloat(t.monto);
+                    }
+                });
+
+                let html = `
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="stat-card"><div class="stat-label">Total Ingresos</div><div class="stat-value amount positive">${formatoMoneda(totals.totalIngresos)}</div></div>
+                    <div class="stat-card"><div class="stat-label">Total Egresos</div><div class="stat-value amount negative">${formatoMoneda(totals.totalEgresos)}</div></div>
+                    <div class="stat-card"><div class="stat-label">Balance</div><div class="stat-value" style="color:${totals.balance >= 0 ? 'var(--success)' : 'var(--danger)'}">${formatoMoneda(totals.balance)}</div></div>
+                    <div class="stat-card"><div class="stat-label">Margen</div><div class="stat-value">${totals.totalIngresos > 0 ? ((totals.balance / totals.totalIngresos) * 100).toFixed(1) + '%' : 'N/A'}</div></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-chart-bar"></i> Ingresos vs Egresos por Categoría</h3></div>
+                    <div class="card-body">
+                        <div class="chart-wrapper"><canvas id="chartCategorias"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-chart-pie"></i> Distribución de Egresos</h3></div>
+                    <div class="card-body">
+                        <div class="chart-wrapper"><canvas id="chartEgresos"></canvas></div>
+                    </div>
+                </div>
+                `;
+                // Guardamos datos para el gráfico en el DOM
+                setTimeout(() => {
+                    window._reportData = { catIngresos, catEgresos };
+                }, 50);
+                return html;
+            }
+
+            function inicializarGraficoReportes() {
+                const data = window._reportData;
+                if (!data) return;
+                const { catIngresos, catEgresos } = data;
+
+                // Destruir gráfico anterior si existe
+                if (chartInstance) {
+                    if (Array.isArray(chartInstance)) {
+                        chartInstance.forEach(c => c.destroy());
+                    } else {
+                        chartInstance.destroy();
+                    }
+                }
+                chartInstance = [];
+
+                const ctx1 = document.getElementById('chartCategorias');
+                if (ctx1) {
+                    const labels = [...new Set([...Object.keys(catIngresos), ...Object.keys(catEgresos)])];
+                    const dataIngresos = labels.map(l => catIngresos[l] || 0);
+                    const dataEgresos = labels.map(l => catEgresos[l] || 0);
+                    const c1 = new Chart(ctx1, {
+                        type: 'bar',
+                        data: {
+                            labels,
+                            datasets: [
+                                { label: 'Ingresos', data: dataIngresos,
+                                    backgroundColor: 'rgba(16,185,129,0.6)', borderColor: '#10b981',
+                                    borderWidth: 2, borderRadius: 8 },
+                                { label: 'Egresos', data: dataEgresos,
+                                    backgroundColor: 'rgba(239,68,68,0.6)', borderColor: '#ef4444',
+                                    borderWidth: 2, borderRadius: 8 }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: { legend: { labels: { color: '#94a3b8', font: { size: 12 } } } },
+                            scales: {
+                                x: { ticks: { color: '#94a3b8', maxRotation: 45 }, grid: { color: '#334155' } },
+                                y: { ticks: { color: '#94a3b8', callback: v => '$' + formatoMonedaSinSimbolo(
+                                        v) }, grid: { color: '#334155' } }
+                            }
+                        }
+                    });
+                    chartInstance.push(c1);
+                }
+
+                const ctx2 = document.getElementById('chartEgresos');
+                if (ctx2 && Object.keys(catEgresos).length > 0) {
+                    const c2 = new Chart(ctx2, {
+                        type: 'doughnut',
+                        data: {
+                            labels: Object.keys(catEgresos),
+                            datasets: [{
+                                data: Object.values(catEgresos),
+                                backgroundColor: ['#ef4444', '#f59e0b', '#f97316', '#e11d48', '#dc2626',
+                                    '#fb923c', '#f87171', '#b91c1c', '#c2410c', '#9f1239'
+                                ],
+                                borderColor: '#1e293b',
+                                borderWidth: 3,
+                                hoverBorderColor: '#f1f5f9'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 10 },
+                                        padding: 12 } }
+                            }
+                        }
+                    });
+                    chartInstance.push(c2);
+                }
+            }
+
+            // ============ ESTADO DE RESULTADOS ============
+            function renderEstadoResultados() {
+                const totals = calcularTotales();
+                const utilidadBruta = totals.totalIngresos;
+                const gastosOperativos = totals.totalEgresos;
+                const utilidadOperativa = utilidadBruta - gastosOperativos;
+                const isrEstimado = utilidadOperativa > 0 ? utilidadOperativa * 0.30 : 0; // 30% ISR estimado México
+                const utilidadNeta = utilidadOperativa - isrEstimado;
+
+                let html = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-file-invoice-dollar"></i> Estado de Resultados (Acumulado)</h3>
+                        <span style="font-size:0.8rem;color:var(--text-muted)">Cifras en Pesos Mexicanos (MXN)</span>
+                    </div>
+                    <div class="card-body">
+                        <table style="font-size:0.9rem;">
+                            <tbody>
+                                <tr style="border-bottom:1px solid var(--border);">
+                                    <td style="font-weight:700;padding:14px;">➕ Ingresos Totales</td>
+                                    <td style="text-align:right;font-weight:700;color:var(--success);padding:14px;">${formatoMoneda(utilidadBruta)}</td>
+                                </tr>
+                                <tr style="border-bottom:1px solid var(--border);">
+                                    <td style="padding:12px 14px;">&nbsp;&nbsp;IVA por pagar contenido</td>
+                                    <td style="text-align:right;color:var(--text-secondary);padding:12px 14px;">${formatoMoneda(totals.ivaPorPagar)}</td>
+                                </tr>
+                                <tr style="border-bottom:2px solid var(--border);">
+                                    <td style="font-weight:700;padding:14px;">➖ Gastos Operativos</td>
+                                    <td style="text-align:right;font-weight:700;color:var(--danger);padding:14px;">(${formatoMoneda(gastosOperativos)})</td>
+                                </tr>
+                                <tr style="border-bottom:1px solid var(--border);">
+                                    <td style="padding:12px 14px;">&nbsp;&nbsp;IVA acreditable contenido</td>
+                                    <td style="text-align:right;color:var(--text-secondary);padding:12px 14px;">${formatoMoneda(totals.ivaAcreditable)}</td>
+                                </tr>
+                                <tr style="border-bottom:2px solid var(--accent-light);background:var(--bg-hover);">
+                                    <td style="font-weight:800;font-size:1rem;padding:16px 14px;">📊 UTILIDAD OPERATIVA</td>
+                                    <td style="text-align:right;font-weight:800;font-size:1rem;padding:16px 14px;color:${utilidadOperativa >= 0 ? 'var(--success)' : 'var(--danger)'}">${formatoMoneda(utilidadOperativa)}</td>
+                                </tr>
+                                <tr style="border-bottom:1px solid var(--border);">
+                                    <td style="padding:14px;">➖ ISR Estimado (30%)</td>
+                                    <td style="text-align:right;color:var(--warning);padding:14px;">(${formatoMoneda(isrEstimado)})</td>
+                                </tr>
+                                <tr style="background:${utilidadNeta >= 0 ? 'var(--success-bg)' : 'var(--danger-bg)'};">
+                                    <td style="font-weight:800;font-size:1.1rem;padding:16px 14px;">💰 UTILIDAD NETA ESTIMADA</td>
+                                    <td style="text-align:right;font-weight:800;font-size:1.1rem;padding:16px 14px;color:${utilidadNeta >= 0 ? 'var(--success)' : 'var(--danger)'}">${formatoMoneda(utilidadNeta)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="highlight-box" style="margin-top:16px;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span><strong>Nota:</strong> El ISR mostrado es una estimación referencial del 30%. El cálculo real depende de tu régimen fiscal (RIF, RESICO, Persona Moral, etc.). Te recomendamos consultar a un contador para el cálculo definitivo.</span>
+                        </div>
+                    </div>
+                </div>`;
+                return html;
+            }
+
+            // ============ CALCULADORA DE IVA ============
+            function renderCalculadoraIVA() {
+                let html = `
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-calculator"></i> Calculadora de IVA — 16% (México)</h3></div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Monto (MXN)</label>
+                                <input type="number" id="calcMonto" placeholder="Ingresa el monto" step="0.01" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo de cálculo</label>
+                                <select id="calcTipo">
+                                    <option value="agregar">Agregar IVA (16%) al monto</option>
+                                    <option value="desglosar">Desglosar IVA (16%) del monto</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="calcResultado" style="margin-top:20px;padding:20px;background:var(--bg-hover);border-radius:var(--radius);display:none;">
+                            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+                                <div><strong>Monto Original:</strong><br><span id="calcOriginal" style="font-size:1.3rem;"></span></div>
+                                <div><strong>IVA (16%):</strong><br><span id="calcIVA" style="font-size:1.3rem;color:var(--warning);"></span></div>
+                                <div><strong>Total:</strong><br><span id="calcTotal" style="font-size:1.5rem;font-weight:800;color:var(--accent-light);"></span></div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="btnCalcularIVA" style="margin-top:12px;"><i class="fas fa-calculator"></i> Calcular</button>
+                    </div>
+                </div>`;
+                return html;
+            }
+
+            function vincularEventosCalculadoraIVA() {
+                const btn = document.getElementById('btnCalcularIVA');
+                const resultadoDiv = document.getElementById('calcResultado');
+                if (!btn || !resultadoDiv) return;
+
+                btn.addEventListener('click', () => {
+                    const monto = parseFloat(document.getElementById('calcMonto')?.value) || 0;
+                    const tipo = document.getElementById('calcTipo')?.value || 'agregar';
+                    if (monto <= 0) {
+                        mostrarToast('Ingresa un monto válido', 'error');
+                        return;
+                    }
+                    let iva, total, original;
+                    if (tipo === 'agregar') {
+                        iva = monto * IVA_RATE;
+                        total = monto + iva;
+                        original = monto;
+                    } else {
+                        original = monto;
+                        iva = monto - (monto / (1 + IVA_RATE));
+                        total = monto;
+                        original = monto - iva;
+                    }
+                    document.getElementById('calcOriginal').textContent = formatoMoneda(original);
+                    document.getElementById('calcIVA').textContent = formatoMoneda(iva);
+                    document.getElementById('calcTotal').textContent = formatoMoneda(total);
+                    resultadoDiv.style.display = 'block';
+                });
+            }
+
+            // ============ MODAL DE TRANSACCIÓN ============
+            function abrirModalTransaccion(transaccion = null) {
+                const modal = document.getElementById('modalTransaccion');
+                const esEdicion = !!transaccion;
+                document.getElementById('modalTitle').innerHTML = esEdicion ?
+                    '<i class="fas fa-edit"></i> Editar Transacción' :
+                    '<i class="fas fa-plus-circle"></i> Nueva Transacción';
+                document.getElementById('txEditId').value = esEdicion ? transaccion.id : '';
+                document.getElementById('txFecha').value = esEdicion ? transaccion.fecha : new Date().toISOString()
+                    .split('T')[0];
+                document.getElementById('txTipo').value = esEdicion ? transaccion.tipo : 'ingreso';
+                document.getElementById('txMonto').value = esEdicion ? transaccion.monto : '';
+                document.getElementById('txConcepto').value = esEdicion ? transaccion.concepto : '';
+                document.getElementById('txIncluyeIVA').value = esEdicion ? transaccion.incluyeIVA : 'no';
+                document.getElementById('txNotas').value = esEdicion ? (transaccion.notas || '') : '';
+                actualizarCategoriasModal();
+                if (esEdicion) {
+                    document.getElementById('txCategoria').value = transaccion.categoria;
+                }
+                actualizarInfoIVA();
+                modal.style.display = 'flex';
+            }
+
+            function cerrarModalTransaccion() {
+                document.getElementById('modalTransaccion').style.display = 'none';
+                document.getElementById('txEditId').value = '';
+            }
+
+            function actualizarCategoriasModal() {
+                const tipo = document.getElementById('txTipo').value;
+                const selectCat = document.getElementById('txCategoria');
+                const categorias = tipo === 'ingreso' ? categoriasIngreso : categoriasEgreso;
+                selectCat.innerHTML = '<option value="">Selecciona categoría</option>' +
+                    categorias.map(c => `<option value="${c}">${c}</option>`).join('');
+                if (!document.getElementById('txEditId').value) {
+                    selectCat.value = '';
+                }
+            }
+
+            function actualizarInfoIVA() {
+                const monto = parseFloat(document.getElementById('txMonto').value) || 0;
+                const incluyeIVA = document.getElementById('txIncluyeIVA').value;
+                const infoBox = document.getElementById('ivaInfoBox');
+                const infoText = document.getElementById('ivaInfoText');
+
+                if (monto > 0 && incluyeIVA === 'si') {
+                    const ivaContenido = monto - (monto / (1 + IVA_RATE));
+                    const base = monto - ivaContenido;
+                    infoBox.style.display = 'flex';
+                    infoText.innerHTML =
+                        `💡 <strong>IVA contenido (16%):</strong> ${formatoMoneda(ivaContenido)} | <strong>Base gravable:</strong> ${formatoMoneda(base)} | El IVA se desglosará automáticamente para tus reportes.`;
+                } else if (monto > 0 && incluyeIVA === 'no') {
+                    const ivaAdicional = monto * IVA_RATE;
+                    infoBox.style.display = 'flex';
+                    infoText.innerHTML =
+                        `📝 <strong>IVA a agregar:</strong> ${formatoMoneda(ivaAdicional)} | <strong>Total con IVA:</strong> ${formatoMoneda(monto + ivaAdicional)} | El monto se considera sin IVA incluido.`;
+                } else {
+                    infoBox.style.display = 'none';
+                }
+            }
+
+            function guardarTransaccion() {
+                const tipo = document.getElementById('txTipo').value;
+                const fecha = document.getElementById('txFecha').value;
+                const categoria = document.getElementById('txCategoria').value;
+                const monto = parseFloat(document.getElementById('txMonto').value);
+                const concepto = document.getElementById('txConcepto').value.trim();
+                const incluyeIVA = document.getElementById('txIncluyeIVA').value;
+                const notas = document.getElementById('txNotas').value.trim();
+                const editId = document.getElementById('txEditId').value;
+
+                if (!fecha || !categoria || !monto || monto <= 0 || !concepto) {
+                    mostrarToast('Por favor completa todos los campos obligatorios.', 'error');
+                    return;
+                }
+
+                if (editId) {
+                    // Editar
+                    const idx = transacciones.findIndex(t => t.id === parseInt(editId));
+                    if (idx >= 0) {
+                        transacciones[idx].tipo = tipo;
+                        transacciones[idx].fecha = fecha;
+                        transacciones[idx].categoria = categoria;
+                        transacciones[idx].monto = monto;
+                        transacciones[idx].concepto = concepto;
+                        transacciones[idx].incluyeIVA = incluyeIVA;
+                        transacciones[idx].notas = notas;
+                        mostrarToast('Transacción actualizada exitosamente ✅', 'success');
+                    }
+                } else {
+                    // Nueva
+                    const nueva = {
+                        id: Date.now(),
+                        tipo,
+                        fecha,
+                        categoria,
+                        monto,
+                        concepto,
+                        incluyeIVA,
+                        notas,
+                        fechaCreacion: new Date().toISOString()
+                    };
+                    transacciones.push(nueva);
+                    mostrarToast('Transacción registrada exitosamente 🎉', 'success');
+                }
+
+                guardarDatos();
+                cerrarModalTransaccion();
+                cambiarVista(vistaActual);
+            }
+
+            function eliminarTransaccion(id) {
+                if (confirm('¿Estás seguro de eliminar esta transacción? Esta acción no se puede deshacer.')) {
+                    transacciones = transacciones.filter(t => t.id !== id);
+                    guardarDatos();
+                    mostrarToast('Transacción eliminada.', 'success');
+                    cambiarVista(vistaActual);
+                }
+            }
+
+            function editarTransaccion(id) {
+                const t = transacciones.find(tx => tx.id === id);
+                if (t) abrirModalTransaccion(t);
+            }
+
+            // ============ EXPORTAR CSV ============
+            function exportarCSV() {
+                if (transacciones.length === 0) {
+                    mostrarToast('No hay datos para exportar.', 'error');
+                    return;
+                }
+                let csv = 'Fecha,Tipo,Categoría,Concepto,Monto,Incluye IVA,Notas\n';
+                transacciones.forEach(t => {
+                    csv +=
+                        `${t.fecha},${t.tipo},${t.categoria},"${t.concepto}",${t.monto},${t.incluyeIVA},"${t.notas || ''}"\n`;
+                });
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ContaPyME_Export_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+                mostrarToast('Datos exportados a CSV 📥', 'success');
+            }
+
+            // ============ EVENTOS ============
+            function vincularEventosTabla() {
+                document.querySelectorAll('.btn-eliminar').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        eliminarTransaccion(id);
+                    });
+                });
+                document.querySelectorAll('.btn-editar').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        editarTransaccion(id);
+                    });
+                });
+            }
+
+            function setupEventListeners() {
+                // Sidebar navigation
+                document.querySelectorAll('.sidebar-nav button[data-view]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const vista = this.getAttribute('data-view');
+                        cambiarVista(vista);
+                        // Cerrar sidebar en móvil
+                        document.getElementById('sidebar').classList.remove('open');
+                    });
+                });
+
+                // Mobile menu
+                document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+                    document.getElementById('sidebar').classList.toggle('open');
+                });
+
+                // Botón nueva transacción
+                document.getElementById('btnNuevaTransaccion').addEventListener('click', () =>
+                    abrirModalTransaccion());
+
+                // Modal
+                document.getElementById('closeModalTransaccion').addEventListener('click', cerrarModalTransaccion);
+                document.getElementById('btnCancelarTransaccion').addEventListener('click', cerrarModalTransaccion);
+                document.getElementById('btnGuardarTransaccion').addEventListener('click', guardarTransaccion);
+                document.getElementById('modalTransaccion').addEventListener('click', function(e) {
+                    if (e.target === this) cerrarModalTransaccion();
+                });
+
+                // Cambios en modal
+                document.getElementById('txTipo').addEventListener('change', actualizarCategoriasModal);
+                document.getElementById('txMonto').addEventListener('input', actualizarInfoIVA);
+                document.getElementById('txIncluyeIVA').addEventListener('change', actualizarInfoIVA);
+
+                // Cerrar sidebar al hacer clic fuera
+                document.addEventListener('click', function(e) {
+                    const sidebar = document.getElementById('sidebar');
+                    const menuBtn = document.getElementById('mobileMenuBtn');
+                    if (window.innerWidth <= 768 &&
+                        sidebar.classList.contains('open') &&
+                        !sidebar.contains(e.target) &&
+                        !menuBtn.contains(e.target)) {
+                        sidebar.classList.remove('open');
+                    }
+                });
+
+                // Tecla Escape para cerrar modal
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        if (document.getElementById('modalTransaccion').style.display === 'flex') {
+                            cerrarModalTransaccion();
+                        }
+                    }
+                });
+            }
+
+            // ============ INICIALIZACIÓN ============
+            function init() {
+                cargarDatos();
+                setupEventListeners();
+                cambiarVista('dashboard');
+                console.log('🚀 ContaPyME inicializada | Contabilidad Digital para PyMES Mexicanas');
+                console.log(`📊 ${transacciones.length} transacciones cargadas | IVA: 16% | Moneda: MXN`);
+            }
+
+            // Exponer funciones globales
+            window.exportarCSV = exportarCSV;
+            window.abrirModalTransaccion = abrirModalTransaccion;
+
+            init();
+        })();
+    </script>
+
+    <!-- Registro del Service Worker para PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registrado:', reg.scope))
+                    .catch(err => console.log('Error al registrar SW:', err));
+            });
+        }
+    </script>
+</body>
+</html>
