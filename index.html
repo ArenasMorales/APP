@@ -5,14 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ContaPyME | Contabilidad Digital para PyMES Mexicanas</title>
 
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ContaPyME">
-    <link rel="apple-touch-icon" href="icon-192.png">
-
     <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
     </script>
@@ -924,8 +916,7 @@
                         transacciones = [];
                     }
                 } else {
-                    // Datos de ejemplo
-                    transacciones = generarDatosEjemplo();
+                    transacciones = [];
                     guardarDatos();
                 }
             }
@@ -1701,17 +1692,6 @@
 
             init();
         })();
-    </script>
-
-    <!-- Registro del Service Worker para PWA -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registrado:', reg.scope))
-                    .catch(err => console.log('Error al registrar SW:', err));
-            });
-        }
     </script>
 </body>
 </html>
